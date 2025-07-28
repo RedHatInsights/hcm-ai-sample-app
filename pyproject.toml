@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hcm-ai-sample-app"
+version = "0.0.1"
+description = "HCM AI Sample App"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text= "MIT License" }
+authors = [
+    { name = "Juan Manuel Barea Martinez", email = "jbarea@redhat.com" },
+]
+dependencies = [
+  "flask",
+  "flask-restful",
+  "flask-cors",
+  "llama-stack-client",
+  "llama-stack",
+  "aiosqlite",
+  "faiss-cpu",
+  "ollama",
+  "datasets",
+  "opentelemetry-exporter-otlp-proto-http",
+  "vllm",
+  "mcp",
+  "autoevals",
+  "xmltodict",
+  "markitdown",
+  "sqlalchemy",
+  "psutil",
+  "torch",
+  "peft",
+  "trl",
+]
+
+[project.urls]
+Homepage = "https://github.com/RedHatInsights/hcm-ai-sample-app"
+
+[project.optional-dependencies]
+dev = [
+  "ipython",
+  "pytest",
+  "ruff",
+  "pre-commit",
+  "flake8"
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.ruff]
+line-length = 100
+indent-width = 4
