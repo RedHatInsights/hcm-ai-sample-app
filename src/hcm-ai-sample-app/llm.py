@@ -1,11 +1,10 @@
 import os
 import uuid
 
-import config as conf
+from . import config as conf
 from llama_stack_client import Agent
 from llama_stack.distribution.library_client import LlamaStackAsLibraryClient
 
-SUMMARY_PROMPT = "You are a helpful agent"
 
 class LlmClient:
     def __init__(self):
@@ -17,17 +16,17 @@ class LlmClient:
         self.agent = Agent(
             self.client,
             model=conf.LLM_MODEL_NAME,
-            instructions=SUMMARY_PROMPT,
+            instructions=conf.SUMMARY_PROMPT,
         )
 
-    def chat(self, prompt):
+    def chat(self, prompt, enable_stream=False):
         try:
             response = self.agent.create_turn(
                 messages=[{"role": "user", "content": prompt}],
-                stream=False,
+                stream=enable_stream,
                 session_id=self.agent.create_session(str(uuid.uuid4())),
             )
-            return response.output_message.content
+            return response
         except Exception as e:
             print(f"Error creating the agent turn: {e}")
             raise
