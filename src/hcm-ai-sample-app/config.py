@@ -3,6 +3,7 @@ import os
 # ─────────────────────────────────────────────
 # Public constants
 # ─────────────────────────────────────────────
+SUMMARY_PROMPT = os.getenv("SUMMARY_PROMPT", "You are a helpful agent")
 LLAMA_STACK_DISTRIBUTION = os.getenv("LLAMA_STACK_DISTRIBUTION", "starter")
 LLM_MODEL_NAME = None
 

@@ -1,7 +1,7 @@
 import os
 import logging
 
-from .api import HealthCheckApi, ChatApi, RagApi
+from .api import HealthCheckApi, ChatApi
 from flask import Flask
 from flask_cors import CORS
 from flask_restful import Api
