@@ -21,4 +21,4 @@ def create_app():
 
 def _initialize_routes(api: Api):
     api.add_resource(HealthCheckApi, "/health", methods=["GET"])
-    api.add_resource(ChatApi, "/chat", methods=["GET","POST"])
+    api.add_resource(ChatApi, "/chat", methods=["POST"])
