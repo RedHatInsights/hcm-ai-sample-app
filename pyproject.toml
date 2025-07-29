@@ -17,7 +17,7 @@ dependencies = [
   "flask-restful",
   "flask-cors",
   "llama-stack-client",
-  "llama-stack",
+  "llama-stack==0.2.15",
   "aiosqlite",
   "faiss-cpu",
   "ollama",
@@ -33,6 +33,7 @@ dependencies = [
   "torch",
   "peft",
   "trl",
+  "openai",
 ]
 
 [project.urls]

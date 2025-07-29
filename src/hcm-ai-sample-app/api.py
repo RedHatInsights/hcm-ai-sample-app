@@ -1,6 +1,4 @@
-import json
-
-from .llm import llm_client
+from .llm.llm_client import llm
 from flask import request, jsonify, Response, stream_with_context
 from flask_restful import Resource
 from llama_stack_client import AgentEventLogger
@@ -10,8 +8,6 @@ class HealthCheckApi(Resource):
         return {"message": "HCM AI Sample App is running!"}, 200
 
 class ChatApi(Resource):
-    def get(self):
-        return {"message": "ChatApi is running!"}, 200
 
     def post(self):
 
@@ -20,28 +16,16 @@ class ChatApi(Resource):
         except ValueError as e:
             return {"error": str(e)}, 400
 
-        result = llm_client.chat(prompt, enable_stream)
-        if enable_stream:
-            return  self._streaming_response(result)
-        else:
-            return jsonify({"result": result.output_message.content})
+        try:
+            response = llm.client.chat(prompt, enable_stream)
 
-    def _streaming_response(self, response):
-        def generate_progress():
-            for log in AgentEventLogger().log(response):
-                try:
-                    event_data = {
-                        "content": str(log)
-                    }
-                    yield f"{json.dumps(event_data)}\n"
-                except Exception as e:
-                    fallback_data = {
-                        "content": str(log),
-                        "error": f"Serialization error: {str(e)}"
-                    }
-                    yield f"{json.dumps(fallback_data)}\n"
-        return  Response(stream_with_context(generate_progress()), mimetype="application/json")
-
+            if enable_stream:
+                return Response(stream_with_context(llm.client.streaming_response(response)), mimetype="application/json")
+            else:
+                content = llm.client.await_response(response)
+                return jsonify({"result": content})
+        except Exception as e:
+            return {"error": str(e)}, 500
 
     def _parse_parameters(self):
 
