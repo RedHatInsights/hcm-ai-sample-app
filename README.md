@@ -2,6 +2,13 @@
 
 A Flask application that provides a unified API interface for different LLM providers through a simplified client architecture.
 
+## ✨ Features
+
+- **Multi-LLM Provider Support**: OpenAI, LangChain (OpenAI, Ollama), and Llama Stack clients
+- **Unified Configuration**: Single set of environment variables for all providers
+- **LangChain Integration**: Access to multiple providers through LangChain unified interface  
+- **Streaming Support**: Real-time response streaming for all providers
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -38,8 +45,24 @@ The application uses environment variables for configuration. Set the appropriat
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `LLM_CLIENT_TYPE` | LLM client type to use. (openai, llama_stack) | Yes | - |
+| `LLM_CLIENT_TYPE` | LLM client type to use. (openai, langchain, llama_stack) | Yes | - |
 | `SUMMARY_PROMPT` | System prompt for the assistant | No | `"You are a helpful assistant."` |
+
+#### Unified Inference Configuration
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `INFERENCE_API_KEY` | API key for the inference provider | Yes | - |
+| `INFERENCE_MODEL_NAME` | Model name to use | No | `"gpt-3.5-turbo"` |
+| `INFERENCE_BASE_URL` | Custom base URL for API endpoint | No | - |
+| `INFERENCE_TEMPERATURE` | Response randomness (0.0-1.0, 0.0=deterministic) | No | `0.7` |
+| `INFERENCE_MAX_TOKENS` | Maximum tokens to generate in response | No | `2048` |
+
+#### LangChain Specific Configuration
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `LANGCHAIN_PROVIDER` | LangChain provider type (openai, ollama) | When using LangChain | `"openai"` |
 
 #### Llama Stack Specific Variables
 
@@ -52,13 +75,15 @@ The application uses environment variables for configuration. Set the appropriat
 | `VLLM_API_TOKEN` | API token for VLLM endpoint | When using VLLM | `ENABLE_VLLM=remote-vllm` |
 | `VLLM_INFERENCE_MODEL` | Model name for VLLM inference | When using VLLM | `ENABLE_VLLM=remote-vllm` |
 
-#### OpenAI Compatible Providers
+#### Legacy OpenAI Configuration (Optional)
 
 | Variable | Description | Required | Used When |
 |----------|-------------|----------|-----------|
-| `OPENAI_API_KEY` | API key for OpenAI-compatible service | Yes | `LLM_CLIENT_TYPE=openai` |
-| `OPENAI_MODEL_NAME` | Model name to use | Yes | `LLM_CLIENT_TYPE=openai` |
-| `OPENAI_BASE_URL` | Custom base URL for API endpoint | No | `LLM_CLIENT_TYPE=openai` |
+| `OPENAI_API_KEY` | API key for OpenAI service (fallback) | No* | When `INFERENCE_API_KEY` not set |
+| `OPENAI_MODEL_NAME` | Model name (fallback) | No* | When `INFERENCE_MODEL_NAME` not set |
+| `OPENAI_BASE_URL` | Custom base URL (fallback) | No* | When `INFERENCE_BASE_URL` not set |
+
+*Note: These are fallback variables. Use `INFERENCE_*` variables for unified configuration.
 
 ## 🔧 Provider Configuration
 
@@ -92,21 +117,62 @@ export SUMMARY_PROMPT="You are a helpful assistant."
 - Access to a remote VLLM service
 - Valid API token for the service
 
-### Option 3: OpenAI-Compatible Service
+### Option 3: OpenAI Client
 
 ```bash
 export LLM_CLIENT_TYPE="openai"
-export OPENAI_API_KEY="your-api-key"
-export OPENAI_MODEL_NAME="mistral-small-24b-w8a8"
-export OPENAI_BASE_URL="https://your-custom-endpoint.com:443/v1"
+export INFERENCE_API_KEY="your-api-key"
+export INFERENCE_MODEL_NAME="gpt-4"
+export INFERENCE_BASE_URL="https://api.openai.com/v1"  # Optional
+export INFERENCE_TEMPERATURE="0.7"  # Optional
+export INFERENCE_MAX_TOKENS="2048"  # Optional
 export SUMMARY_PROMPT="You are a helpful assistant."
 ```
 
 **Requirements:**
-- Access to OpenAI-compatible API service
-- Valid API key for the service
+- OpenAI API key
 
-**Note:** For standard OpenAI service, omit `OPENAI_BASE_URL` or set it to `https://api.openai.com/v1`
+### Option 4: LangChain with OpenAI
+
+```bash
+export LLM_CLIENT_TYPE="langchain"
+export LANGCHAIN_PROVIDER="openai"
+export INFERENCE_API_KEY="your-openai-api-key"
+export INFERENCE_MODEL_NAME="gpt-4"
+export INFERENCE_TEMPERATURE="0.7"  # Optional
+export INFERENCE_MAX_TOKENS="2048"  # Optional
+export SUMMARY_PROMPT="You are a helpful assistant."
+```
+
+**Requirements:**
+- OpenAI API key
+
+### Option 5: LangChain with Ollama
+
+```bash
+export LLM_CLIENT_TYPE="langchain"
+export LANGCHAIN_PROVIDER="ollama"
+export INFERENCE_MODEL_NAME="llama3.2"
+export INFERENCE_BASE_URL="http://localhost:11434"
+export INFERENCE_TEMPERATURE="0.7"  # Optional
+export SUMMARY_PROMPT="You are a helpful assistant."
+```
+
+**Requirements:**
+- Ollama running locally or remotely
+
+## 📦 Installation
+
+The application includes all LangChain dependencies by default:
+
+```bash
+# Install all dependencies (includes LangChain support)
+pip install -e .
+```
+
+This includes support for:
+- OpenAI through LangChain (`langchain-openai`)
+- Ollama through LangChain (`langchain-ollama`)
 
 ## 📡 API Endpoints
 
@@ -184,10 +250,11 @@ The application uses a unified client architecture that abstracts different LLM 
 │   Flask API     │    │    LLM Client   │    │   LLM Provider  │
 │                 │    │                 │    │                 │
 │  ┌─────────────┐│    │  ┌─────────────┐│    │  ┌─────────────┐│
-│  │ ChatApi     ││────│  │ llm.client  ││────│  │ Llama Stack ││
-│  └─────────────┘│    │  └─────────────┘│    │  │ + Ollama    ││
-└─────────────────┘    └─────────────────┘    │  │ + VLLM      ││
-                                              │  │ OpenAI API  ││
+│  │ ChatApi     ││────│  │ llm.client  ││────│  │ OpenAI      ││
+│  └─────────────┘│    │  └─────────────┘│    │  │ LangChain   ││
+└─────────────────┘    └─────────────────┘    │  │ ├─OpenAI   ││
+                                              │  │ └─Ollama   ││
+                                              │  │ Llama Stack ││
                                               │  └─────────────┘│
                                               └─────────────────┘
 ```
@@ -196,16 +263,17 @@ The application uses a unified client architecture that abstracts different LLM 
 
 - **Flask API**: Handles HTTP requests and responses via ChatApi
 - **LLM Client**: Unified interface (`llm.client`) for different LLM providers
-- **LLM Providers**: Support for Llama Stack (with Ollama/VLLM) and OpenAI-compatible APIs
+- **LLM Providers**: Support for OpenAI, LangChain (OpenAI/Ollama), and Llama Stack
 
 ### Features
 
 - ✅ **Unified Interface**: Same API regardless of LLM provider type
+- ✅ **Unified Configuration**: Single set of environment variables across providers
 - ✅ **Streaming Support**: Real-time response streaming for all providers
-- ✅ **Multiple Client Types**: Llama Stack (local/remote) and OpenAI-compatible
-- ✅ **Flexible Model Support**: Local models via Ollama, remote models via VLLM/API
+- ✅ **Multiple Client Types**: OpenAI, LangChain (multi-provider), and Llama Stack
+- ✅ **LangChain Integration**: Access to OpenAI, Ollama through LangChain
+- ✅ **Flexible Model Support**: Local models via Ollama, cloud models via APIs
 - ✅ **Error Handling**: Comprehensive error handling and validation
-- ✅ **Environment-based Config**: Easy configuration through environment variables
 
 ## 🧪 Testing
 
@@ -241,6 +309,18 @@ The API returns appropriate HTTP status codes:
 
 ### Selecting the Right Client Type
 
+- **Use OpenAI Client** when:
+  - You want direct OpenAI API integration
+  - You need the simplest setup for OpenAI models
+  - You want minimal dependencies
+
+- **Use LangChain Client** when:
+  - You want flexibility to switch between providers (OpenAI, Ollama)
+  - You want to use local models through Ollama
+  - You plan to leverage LangChain's ecosystem in the future
+  - You want a unified interface across multiple LLM providers
+  - You prefer LangChain's abstractions and tooling
+
 - **Use Llama Stack + Ollama** when:
   - You want to run models locally
   - You have sufficient hardware resources
@@ -250,11 +330,6 @@ The API returns appropriate HTTP status codes:
   - You have access to a hosted VLLM service
   - You need high-performance inference
   - You want to use custom model deployments
-
-- **Use OpenAI-Compatible** when:
-  - You want to use OpenAI, Azure OpenAI, or similar services
-  - You need to integrate with existing OpenAI-compatible APIs
-  - You want the simplest setup for cloud-based models
 
 ## 📝 License
 
