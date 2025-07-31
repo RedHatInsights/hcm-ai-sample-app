@@ -4,7 +4,7 @@ A Flask application that provides a unified API interface for different LLM prov
 
 ## ✨ Features
 
-- **Multi-LLM Provider Support**: OpenAI, LangChain (OpenAI, Ollama), and Llama Stack clients
+- **Multi-LLM Provider Support**: OpenAI and LangChain (OpenAI, Ollama) clients
 - **Unified Configuration**: Single set of environment variables for all providers
 - **LangChain Integration**: Access to multiple providers through LangChain unified interface  
 - **Streaming Support**: Real-time response streaming for all providers
@@ -45,7 +45,7 @@ The application uses environment variables for configuration. Set the appropriat
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `LLM_CLIENT_TYPE` | LLM client type to use. (openai, langchain, llama_stack) | Yes | - |
+| `LLM_CLIENT_TYPE` | LLM client type to use. (openai, langchain) | Yes | - |
 | `SUMMARY_PROMPT` | System prompt for the assistant | No | `"You are a helpful assistant."` |
 
 #### Unified Inference Configuration
@@ -64,17 +64,6 @@ The application uses environment variables for configuration. Set the appropriat
 |----------|-------------|----------|---------|
 | `LANGCHAIN_PROVIDER` | LangChain provider type (openai, ollama) | When using LangChain | `"openai"` |
 
-#### Llama Stack Specific Variables
-
-| Variable | Description | Required | Used When |
-|----------|-------------|----------|-----------|
-| `ENABLE_OLLAMA` | Enable Ollama provider | When using local | `LLM_CLIENT_TYPE=llama_stack` |
-| `SAFETY_MODEL` | Ollama model name | When using Ollama | `ENABLE_OLLAMA=ollama` |
-| `ENABLE_VLLM` | Enable remote VLLM provider | When using remote | `LLM_CLIENT_TYPE=llama_stack` |
-| `VLLM_URL` | Remote VLLM endpoint URL | When using VLLM | `ENABLE_VLLM=remote-vllm` |
-| `VLLM_API_TOKEN` | API token for VLLM endpoint | When using VLLM | `ENABLE_VLLM=remote-vllm` |
-| `VLLM_INFERENCE_MODEL` | Model name for VLLM inference | When using VLLM | `ENABLE_VLLM=remote-vllm` |
-
 #### Legacy OpenAI Configuration (Optional)
 
 | Variable | Description | Required | Used When |
@@ -89,35 +78,7 @@ The application uses environment variables for configuration. Set the appropriat
 
 The application supports three different LLM client configurations:
 
-### Option 1: Llama Stack with Local Ollama
-
-```bash
-export LLM_CLIENT_TYPE="llama_stack"
-export ENABLE_OLLAMA="ollama"
-export SAFETY_MODEL="llama3.2:3b-instruct-fp16"
-export SUMMARY_PROMPT="You are a helpful assistant."
-```
-
-**Requirements:**
-- Ollama must be installed and running locally
-- The specified model must be available in Ollama
-
-### Option 2: Llama Stack with Remote VLLM
-
-```bash
-export LLM_CLIENT_TYPE="llama_stack"
-export ENABLE_VLLM="remote-vllm"
-export VLLM_URL="https://your-vllm-endpoint.com:443/v1"
-export VLLM_API_TOKEN="your-api-token"
-export VLLM_INFERENCE_MODEL="mistral-small-24b-w8a8"
-export SUMMARY_PROMPT="You are a helpful assistant."
-```
-
-**Requirements:**
-- Access to a remote VLLM service
-- Valid API token for the service
-
-### Option 3: OpenAI Client
+### Option 1: OpenAI Client
 
 ```bash
 export LLM_CLIENT_TYPE="openai"
@@ -132,7 +93,7 @@ export SUMMARY_PROMPT="You are a helpful assistant."
 **Requirements:**
 - OpenAI API key
 
-### Option 4: LangChain with OpenAI
+### Option 2: LangChain with OpenAI
 
 ```bash
 export LLM_CLIENT_TYPE="langchain"
@@ -147,7 +108,7 @@ export SUMMARY_PROMPT="You are a helpful assistant."
 **Requirements:**
 - OpenAI API key
 
-### Option 5: LangChain with Ollama
+### Option 3: LangChain with Ollama
 
 ```bash
 export LLM_CLIENT_TYPE="langchain"
@@ -173,6 +134,128 @@ pip install -e .
 This includes support for:
 - OpenAI through LangChain (`langchain-openai`)
 - Ollama through LangChain (`langchain-ollama`)
+
+## 🚢 OpenShift Deployment
+
+The application includes an OpenShift template for easy deployment with configurable parameters.
+
+### Template Parameters
+
+| Parameter | Description | Default Value |
+|-----------|-------------|---------------|
+| `MEMORY_REQUEST` | Memory request for the API pods | `"512Mi"` |
+| `MEMORY_LIMIT` | Memory limit for the API pods | `"1Gi"` |
+| `CPU_REQUEST` | CPU request for the API pods | `"250m"` |
+| `CPU_LIMIT` | CPU limit for the API pods | `"500m"` |
+| `LLM_CLIENT_TYPE` | Type of LLM client (openai, langchain) | `"langchain"` |
+| `LANGCHAIN_PROVIDER` | LangChain provider (openai, ollama) | `"openai"` |
+| `INFERENCE_MODEL_NAME` | Model name for inference | `"mistral-small-24b-w8a8"` |
+| `INFERENCE_BASE_URL` | Base URL for inference API | Custom endpoint |
+| `INFERENCE_TEMPERATURE` | Response randomness (0.0-1.0) | `"0.7"` |
+| `INFERENCE_MAX_TOKENS` | Maximum tokens to generate | `"2048"` |
+| `SUMMARY_PROMPT` | System prompt for the AI assistant | `"You are a helpful assistant."` |
+
+### Deployment Examples
+
+#### Deploy with Default Values
+```bash
+oc process -f templates/service-template.yaml | oc apply -f -
+```
+
+#### Deploy with Custom Configuration
+```bash
+oc process -f templates/service-template.yaml \
+  -p LLM_CLIENT_TYPE="openai" \
+  -p INFERENCE_MODEL_NAME="gpt-4" \
+  -p INFERENCE_TEMPERATURE="0.8" \
+  -p INFERENCE_MAX_TOKENS="1024" \
+  -p SUMMARY_PROMPT="You are an expert assistant." \
+  | oc apply -f -
+```
+
+#### Deploy for Ollama Usage
+```bash
+oc process -f templates/service-template.yaml \
+  -p LLM_CLIENT_TYPE="langchain" \
+  -p LANGCHAIN_PROVIDER="ollama" \
+  -p INFERENCE_MODEL_NAME="llama3.2" \
+  -p INFERENCE_BASE_URL="http://ollama-service:11434" \
+  -p MEMORY_LIMIT="2Gi" \
+  | oc apply -f -
+```
+
+#### Deploy for Production Workload
+```bash
+oc process -f templates/service-template.yaml \
+  -p MEMORY_REQUEST="1Gi" \
+  -p MEMORY_LIMIT="2Gi" \
+  -p CPU_REQUEST="500m" \
+  -p CPU_LIMIT="1000m" \
+  -p INFERENCE_MODEL_NAME="gpt-4" \
+  -p INFERENCE_TEMPERATURE="0.5" \
+  | oc apply -f -
+```
+
+### Template Management
+
+#### View Available Parameters
+```bash
+oc process --parameters -f templates/service-template.yaml
+```
+
+#### Process Template without Applying
+```bash
+oc process -f templates/service-template.yaml \
+  -p LLM_CLIENT_TYPE="openai" \
+  -p INFERENCE_MODEL_NAME="gpt-4"
+```
+
+#### Update Existing Deployment
+```bash
+oc process -f templates/service-template.yaml \
+  -p INFERENCE_TEMPERATURE="0.9" \
+  | oc apply -f -
+```
+
+### Secret Configuration
+
+The template creates a secret with the API key. Update the secret with your actual API key:
+
+```bash
+# Create or update the secret
+oc create secret generic hcm-ai-sample-app-secret \
+  --from-literal=INFERENCE_API_KEY="your-actual-api-key" \
+  --dry-run=client -o yaml | oc apply -f -
+
+# Or patch existing secret
+oc patch secret hcm-ai-sample-app-secret \
+  -p '{"data":{"INFERENCE_API_KEY":"'$(echo -n "your-actual-api-key" | base64)'"}}'
+```
+
+### Monitoring and Health Checks
+
+The deployment includes:
+- **Liveness Probe**: Checks `/health` endpoint every 10 seconds
+- **Readiness Probe**: Checks `/health` endpoint every 5 seconds
+- **Resource Limits**: Configurable CPU and memory limits
+- **Security Context**: Runs as non-root user
+
+### Accessing the Application
+
+After deployment, the application will be available through the OpenShift route:
+
+```bash
+# Get the route URL
+oc get route hcm-ai-sample-app -o jsonpath='{.spec.host}'
+
+# Test the health endpoint
+curl https://$(oc get route hcm-ai-sample-app -o jsonpath='{.spec.host}')/health
+
+# Test the chat endpoint
+curl -X POST https://$(oc get route hcm-ai-sample-app -o jsonpath='{.spec.host}')/chat \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Hello, how are you?", "enable_stream": "False"}'
+```
 
 ## 📡 API Endpoints
 
@@ -254,7 +337,6 @@ The application uses a unified client architecture that abstracts different LLM 
 │  └─────────────┘│    │  └─────────────┘│    │  │ LangChain   ││
 └─────────────────┘    └─────────────────┘    │  │ ├─OpenAI   ││
                                               │  │ └─Ollama   ││
-                                              │  │ Llama Stack ││
                                               │  └─────────────┘│
                                               └─────────────────┘
 ```
@@ -263,14 +345,14 @@ The application uses a unified client architecture that abstracts different LLM 
 
 - **Flask API**: Handles HTTP requests and responses via ChatApi
 - **LLM Client**: Unified interface (`llm.client`) for different LLM providers
-- **LLM Providers**: Support for OpenAI, LangChain (OpenAI/Ollama), and Llama Stack
+- **LLM Providers**: Support for OpenAI and LangChain (OpenAI/Ollama)
 
 ### Features
 
 - ✅ **Unified Interface**: Same API regardless of LLM provider type
 - ✅ **Unified Configuration**: Single set of environment variables across providers
 - ✅ **Streaming Support**: Real-time response streaming for all providers
-- ✅ **Multiple Client Types**: OpenAI, LangChain (multi-provider), and Llama Stack
+- ✅ **Multiple Client Types**: OpenAI and LangChain (multi-provider)
 - ✅ **LangChain Integration**: Access to OpenAI, Ollama through LangChain
 - ✅ **Flexible Model Support**: Local models via Ollama, cloud models via APIs
 - ✅ **Error Handling**: Comprehensive error handling and validation
@@ -304,32 +386,6 @@ The API returns appropriate HTTP status codes:
   "error": "Error description here"
 }
 ```
-
-## 🔍 Configuration Tips
-
-### Selecting the Right Client Type
-
-- **Use OpenAI Client** when:
-  - You want direct OpenAI API integration
-  - You need the simplest setup for OpenAI models
-  - You want minimal dependencies
-
-- **Use LangChain Client** when:
-  - You want flexibility to switch between providers (OpenAI, Ollama)
-  - You want to use local models through Ollama
-  - You plan to leverage LangChain's ecosystem in the future
-  - You want a unified interface across multiple LLM providers
-  - You prefer LangChain's abstractions and tooling
-
-- **Use Llama Stack + Ollama** when:
-  - You want to run models locally
-  - You have sufficient hardware resources
-  - You need offline capability
-
-- **Use Llama Stack + VLLM** when:
-  - You have access to a hosted VLLM service
-  - You need high-performance inference
-  - You want to use custom model deployments
 
 ## 📝 License
 
