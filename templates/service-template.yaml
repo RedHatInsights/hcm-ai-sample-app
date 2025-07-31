@@ -1,0 +1,164 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  name: hcm-ai-sample-app-service
+  annotations:
+    openshift.io/display-name: Jira Activity Summarizer Service
+    description: Jira Activity Summarizer Service
+    tags: ai,service-delivery,hcm-ai-sample-app
+    iconClass: icon-shadowman
+    template.openshift.io/provider-display-name: Red Hat, Inc.
+    template.openshift.io/documentation-url: https://github.com/RedHatInsights/hcm-ai-sample-app
+labels:
+  template: hcm-ai-sample-app
+parameters:
+  # Resource Configuration
+  - name: MEMORY_REQUEST
+    description: Memory request for the API pods.
+    value: "512Mi"
+  - name: MEMORY_LIMIT
+    description: Memory limit for the API pods.
+    value: "1Gi"
+  - name: CPU_REQUEST
+    description: CPU request for the API pods.
+    value: "250m"
+  - name: CPU_LIMIT
+    description: CPU limit for the API pods.
+    value: "500m"
+  
+  # LLM Client Configuration
+  - name: LLM_CLIENT_TYPE
+    description: Type of LLM client to use (openai, langchain, llama_stack).
+    value: "langchain"
+  - name: LANGCHAIN_PROVIDER
+    description: LangChain provider to use (openai, ollama).
+    value: "openai"
+  
+  # Inference Configuration
+  - name: INFERENCE_MODEL_NAME
+    description: Model name to use for inference.
+    value: "mistral-small-24b-w8a8"
+  - name: INFERENCE_BASE_URL
+    description: Base URL for the inference API endpoint.
+    value: "https://mistral-small-24b-w8a8-maas-apicast-production.apps.prod.rhoai.rh-aiservices-bu.com:443/v1"
+  - name: INFERENCE_TEMPERATURE
+    description: Temperature for response randomness (0.0-1.0).
+    value: "0.7"
+  - name: INFERENCE_MAX_TOKENS
+    description: Maximum number of tokens to generate in response.
+    value: "2048"
+  - name: SUMMARY_PROMPT
+    description: System prompt for the AI assistant.
+    value: "You are a helpful assistant."
+objects:
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: hcm-ai-sample-app
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: hcm-ai-sample-app
+      template:
+        metadata:
+          labels:
+            app: hcm-ai-sample-app
+        spec:
+          containers:
+            - name: hcm-ai-sample-app
+              image: quay.io/jbarea/hcm-ai-sample-app:0.1
+              ports:
+                - containerPort: 8000
+              resources:
+                requests:
+                  memory: ${MEMORY_REQUEST}
+                  cpu: ${CPU_REQUEST}
+                limits:
+                  memory: ${MEMORY_LIMIT}
+                  cpu: ${CPU_LIMIT}
+              env:
+                # LLM Client Configuration
+                - name: LLM_CLIENT_TYPE
+                  value: ${LLM_CLIENT_TYPE}
+                - name: LANGCHAIN_PROVIDER
+                  value: ${LANGCHAIN_PROVIDER}
+                
+                # Inference Configuration
+                - name: INFERENCE_API_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: hcm-ai-sample-app-secret
+                      key: INFERENCE_API_KEY
+                - name: INFERENCE_MODEL_NAME
+                  value: ${INFERENCE_MODEL_NAME}
+                - name: INFERENCE_BASE_URL
+                  value: ${INFERENCE_BASE_URL}
+                
+                # Optional Configuration (with defaults)
+                - name: INFERENCE_TEMPERATURE
+                  value: ${INFERENCE_TEMPERATURE}
+                - name: INFERENCE_MAX_TOKENS
+                  value: ${INFERENCE_MAX_TOKENS}
+                - name: SUMMARY_PROMPT
+                  value: ${SUMMARY_PROMPT}
+              
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8000
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+                failureThreshold: 3
+              
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 8000
+                initialDelaySeconds: 5
+                periodSeconds: 5
+                timeoutSeconds: 3
+                failureThreshold: 2
+              
+              imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: hcm-ai-sample-app
+    spec:
+      selector:
+        app: hcm-ai-sample-app
+      ports:
+        - protocol: TCP
+          port: 443
+          targetPort: 8000
+
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: hcm-ai-sample-app
+      annotations:
+        haproxy.router.openshift.io/timeout: "1200s"
+    spec:
+      port:
+        targetPort: 8000
+      to:
+        kind: Service
+        name: hcm-ai-sample-app
+        weight: 100
+      tls:
+        termination: edge
+      wildcardPolicy: None
+
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: hcm-ai-sample-app-secret
+    type: Opaque
+    data:
+      INFERENCE_API_KEY: OTUzYmM4YzdjMTc3ZmNmMWQ3NzVlZTZjZWZlMjViMjc=
