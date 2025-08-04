@@ -68,7 +68,7 @@ objects:
         spec:
           containers:
             - name: hcm-ai-sample-app
-              image: quay.io/jbarea/hcm-ai-sample-app:0.1
+              image: quay.io/jbarea/hcm-ai-sample-app:1.0
               ports:
                 - containerPort: 8000
               resources:
