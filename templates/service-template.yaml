@@ -2,68 +2,68 @@
 kind: Template
 apiVersion: template.openshift.io/v1
 metadata:
-  name: ${parameter.projectName}-service
+  name: "{{parameter.projectName}}-service"
   annotations:
     openshift.io/display-name: AI sample application
     description: AI sample application
-    tags: ai,service-delivery,${parameter.projectName}
+    tags: ai,service-delivery,{{parameter.projectName}}
 labels:
-  template: ${parameter.projectName}
+  template: {{parameter.projectName}}
 parameters:
   # Resource Configuration
   - name: MEMORY_REQUEST
     description: Memory request for the API pods.
-    value: ${parameters.memoryRequest}
+    value: {{parameters.memoryRequest}}
   - name: MEMORY_LIMIT
     description: Memory limit for the API pods.
-    value: ${parameters.memoryLimit}
+    value: {{parameters.memoryLimit}}
   - name: CPU_REQUEST
     description: CPU request for the API pods.
-    value: ${parameters.cpuRequest}
+    value: {{parameters.cpuRequest}}
   - name: CPU_LIMIT
     description: CPU limit for the API pods.
-    value: ${parameters.cpuLimit}
+    value: {{parameters.cpuLimit}}
   # LLM Client Configuration
   - name: LLM_CLIENT_TYPE
     description: Type of LLM client to use (openai, langchain, llama_stack).
-    value: ${parameters.llmClientType}
+    value: {{parameters.llmClientType}}
   - name: LANGCHAIN_PROVIDER
     description: LangChain provider to use (openai, ollama).
-    value: ${parameters.langchainProvider}
+    value: {{parameters.langchainProvider}}
   # Inference Configuration
   - name: INFERENCE_MODEL_NAME
     description: Model name to use for inference.
-    value: ${parameters.inferenceModelName}
+    value: {{parameters.inferenceModelName}}
   - name: INFERENCE_BASE_URL
     description: Base URL for the inference API endpoint.
-    value: ${parameters.inferenceBaseUrl}
+    value: {{parameters.inferenceBaseUrl}}
   - name: INFERENCE_TEMPERATURE
     description: Temperature for response randomness (0.0-1.0).
-    value: ${parameters.inferenceTemperature}
+    value: {{parameters.inferenceTemperature}}
   - name: INFERENCE_MAX_TOKENS
     description: Maximum number of tokens to generate in response.
-    value: ${parameters.inferenceMaxTokens}
+    value: {{parameters.inferenceMaxTokens}}
   - name: SUMMARY_PROMPT
     description: System prompt for the AI assistant.
-    value: ${parameters.summaryPrompt}
+    value: {{parameters.summaryPrompt}}
 
 objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: ${parameter.projectName}
+      name: {{parameter.projectName}}
     spec:
       replicas: 3
       selector:
         matchLabels:
-          app: ${parameter.projectName}
+          app: {{parameter.projectName}}
       template:
         metadata:
           labels:
-            app: ${parameter.projectName}
+            app: {{parameter.projectName}}
         spec:
           containers:
-            - name: ${parameter.projectName}
+            - name: {{parameter.projectName}}
               image: quay.io/jbarea/hcm-ai-sample-app:1.0
               ports:
                 - containerPort: 8000
@@ -125,10 +125,10 @@ objects:
   - apiVersion: v1
     kind: Service
     metadata:
-      name: ${parameter.projectName}
+      name: {{parameter.projectName}}
     spec:
       selector:
-        app: ${parameter.projectName}
+        app: {{parameter.projectName}}
       ports:
         - protocol: TCP
           port: 443
@@ -137,7 +137,7 @@ objects:
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
-      name: ${parameter.projectName}
+      name: {{parameter.projectName}}
       annotations:
         haproxy.router.openshift.io/timeout: "1200s"
     spec:
@@ -145,7 +145,7 @@ objects:
         targetPort: 8000
       to:
         kind: Service
-        name: ${parameter.projectName}
+        name: {{parameter.projectName}}
         weight: 100
       tls:
         termination: edge
@@ -154,7 +154,7 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${parameter.projectName}-secret
+      name: "{{parameter.projectName}}-secret"
     type: Opaque
     data:
-      INFERENCE_API_KEY:  ${parameters.inferenceApiKey} | base64"
+      INFERENCE_API_KEY:  "{{parameters.inferenceApiKey}} | base64"
