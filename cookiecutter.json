@@ -1,0 +1,5 @@
+{
+    "projectName": "${parameters.projectName}",
+    "initialize_git": "y",
+    "quay_org": "cloudservices"
+}
