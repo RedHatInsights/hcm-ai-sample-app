@@ -1,3 +1,3 @@
-FLASK_APP=${parameters.projectName}
+FLASK_APP={{cookiecutter.projectName}}
 FLASK_RUN_PORT=8000
 FLASK_RUN_HOST="0.0.0.0"

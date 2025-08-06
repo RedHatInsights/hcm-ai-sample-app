@@ -223,12 +223,12 @@ The template creates a secret with the API key. Update the secret with your actu
 
 ```bash
 # Create or update the secret
-oc create secret generic ${parameters.projectName}-secret \
+oc create secret generic {{cookiecutter.projectName}}-secret \
   --from-literal=INFERENCE_API_KEY="your-actual-api-key" \
   --dry-run=client -o yaml | oc apply -f -
 
 # Or patch existing secret
-oc patch secret ${parameters.projectName}-secret \
+oc patch secret {{cookiecutter.projectName}}-secret \
   -p '{"data":{"INFERENCE_API_KEY":"'$(echo -n "your-actual-api-key" | base64)'"}}'
 ```
 
@@ -246,13 +246,13 @@ After deployment, the application will be available through the OpenShift route:
 
 ```bash
 # Get the route URL
-oc get route ${parameters.projectName} -o jsonpath='{.spec.host}'
+oc get route {{cookiecutter.projectName}} -o jsonpath='{.spec.host}'
 
 # Test the health endpoint
-curl https://$(oc get route ${parameters.projectName} -o jsonpath='{.spec.host}')/health
+curl https://$(oc get route {{cookiecutter.projectName}} -o jsonpath='{.spec.host}')/health
 
 # Test the chat endpoint
-curl -X POST https://$(oc get route ${parameters.projectName} -o jsonpath='{.spec.host}')/chat \
+curl -X POST https://$(oc get route {{cookiecutter.projectName}} -o jsonpath='{.spec.host}')/chat \
   -H "Content-Type: application/json" \
   -d '{"prompt": "Hello, how are you?", "enable_stream": "False"}'
 ```
