@@ -1,0 +1,5 @@
+{
+    "project_name": "hcm-ai-sample-app",
+    "initialize_git": "y",
+    "quay_org": "cloudservices"
+}
