@@ -2,72 +2,68 @@
 kind: Template
 apiVersion: template.openshift.io/v1
 metadata:
-  name: hcm-ai-sample-app-service
+  name: ${parameter.projectName}-service
   annotations:
-    openshift.io/display-name: Jira Activity Summarizer Service
-    description: Jira Activity Summarizer Service
-    tags: ai,service-delivery,hcm-ai-sample-app
-    iconClass: icon-shadowman
-    template.openshift.io/provider-display-name: Red Hat, Inc.
-    template.openshift.io/documentation-url: https://github.com/RedHatInsights/hcm-ai-sample-app
+    openshift.io/display-name: AI sample application
+    description: AI sample application
+    tags: ai,service-delivery,${parameter.projectName}
 labels:
-  template: hcm-ai-sample-app
+  template: ${parameter.projectName}
 parameters:
   # Resource Configuration
   - name: MEMORY_REQUEST
     description: Memory request for the API pods.
-    value: "512Mi"
+    value: ${parameters.memoryRequest}
   - name: MEMORY_LIMIT
     description: Memory limit for the API pods.
-    value: "1Gi"
+    value: ${parameters.memoryLimit}
   - name: CPU_REQUEST
     description: CPU request for the API pods.
-    value: "250m"
+    value: ${parameters.cpuRequest}
   - name: CPU_LIMIT
     description: CPU limit for the API pods.
-    value: "500m"
-  
+    value: ${parameters.cpuLimit}
   # LLM Client Configuration
   - name: LLM_CLIENT_TYPE
     description: Type of LLM client to use (openai, langchain, llama_stack).
-    value: "langchain"
+    value: ${parameters.llmClientType}
   - name: LANGCHAIN_PROVIDER
     description: LangChain provider to use (openai, ollama).
-    value: "openai"
-  
+    value: ${parameters.langchainProvider}
   # Inference Configuration
   - name: INFERENCE_MODEL_NAME
     description: Model name to use for inference.
-    value: "mistral-small-24b-w8a8"
+    value: ${parameters.inferenceModelName}
   - name: INFERENCE_BASE_URL
     description: Base URL for the inference API endpoint.
-    value: "https://mistral-small-24b-w8a8-maas-apicast-production.apps.prod.rhoai.rh-aiservices-bu.com:443/v1"
+    value: ${parameters.inferenceBaseUrl}
   - name: INFERENCE_TEMPERATURE
     description: Temperature for response randomness (0.0-1.0).
-    value: "0.7"
+    value: ${parameters.inferenceTemperature}
   - name: INFERENCE_MAX_TOKENS
     description: Maximum number of tokens to generate in response.
-    value: "2048"
+    value: ${parameters.inferenceMaxTokens}
   - name: SUMMARY_PROMPT
     description: System prompt for the AI assistant.
-    value: "You are a helpful assistant."
+    value: ${parameters.summaryPrompt}
+
 objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: hcm-ai-sample-app
+      name: ${parameter.projectName}
     spec:
       replicas: 3
       selector:
         matchLabels:
-          app: hcm-ai-sample-app
+          app: ${parameter.projectName}
       template:
         metadata:
           labels:
-            app: hcm-ai-sample-app
+            app: ${parameter.projectName}
         spec:
           containers:
-            - name: hcm-ai-sample-app
+            - name: ${parameter.projectName}
               image: quay.io/jbarea/hcm-ai-sample-app:1.0
               ports:
                 - containerPort: 8000
@@ -89,7 +85,7 @@ objects:
                 - name: INFERENCE_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: hcm-ai-sample-app-secret
+                      name: ${parameter.projectName}-secret
                       key: INFERENCE_API_KEY
                 - name: INFERENCE_MODEL_NAME
                   value: ${INFERENCE_MODEL_NAME}
@@ -129,10 +125,10 @@ objects:
   - apiVersion: v1
     kind: Service
     metadata:
-      name: hcm-ai-sample-app
+      name: ${parameter.projectName}
     spec:
       selector:
-        app: hcm-ai-sample-app
+        app: ${parameter.projectName}
       ports:
         - protocol: TCP
           port: 443
@@ -141,7 +137,7 @@ objects:
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
-      name: hcm-ai-sample-app
+      name: ${parameter.projectName}
       annotations:
         haproxy.router.openshift.io/timeout: "1200s"
     spec:
@@ -149,7 +145,7 @@ objects:
         targetPort: 8000
       to:
         kind: Service
-        name: hcm-ai-sample-app
+        name: ${parameter.projectName}
         weight: 100
       tls:
         termination: edge
@@ -158,7 +154,7 @@ objects:
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: hcm-ai-sample-app-secret
+      name: ${parameter.projectName}-secret
     type: Opaque
     data:
-      INFERENCE_API_KEY: OTUzYmM4YzdjMTc3ZmNmMWQ3NzVlZTZjZWZlMjViMjc=
+      INFERENCE_API_KEY:  "{{ parameters.inferenceApiKey | b64enc }}"

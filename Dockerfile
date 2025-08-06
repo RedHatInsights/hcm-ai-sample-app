@@ -35,7 +35,7 @@ FROM python:3.12-slim AS production
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/app/.venv/bin:$PATH" \
-    FLASK_APP="src.hcm-ai-sample-app:app" \
+    FLASK_APP="src.${parameters.projectName}:app" \
     FLASK_ENV=production
 
 # Create non-root user for security

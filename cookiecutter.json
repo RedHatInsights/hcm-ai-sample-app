@@ -1,5 +1,5 @@
 {
-    "project_name": "hcm-ai-sample-app",
+    "projectName": "${parameters.projectName}",
     "initialize_git": "y",
     "quay_org": "cloudservices"
 }
