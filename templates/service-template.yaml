@@ -157,4 +157,4 @@ objects:
       name: ${parameter.projectName}-secret
     type: Opaque
     data:
-      INFERENCE_API_KEY:  "{{ ${parameters.inferenceApiKey} | base64 }}"
+      INFERENCE_API_KEY:  ${parameters.inferenceApiKey} | base64"
