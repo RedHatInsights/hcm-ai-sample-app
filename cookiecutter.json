@@ -5,11 +5,12 @@
   "cpuRequest": "250m",
   "cpuLimit": "500m",
   "llmClientType": "langchain",
+  "inferenceServiceMode": "HCMAI",
   "langchainProvider": "openai",
   "inferenceModelName": "mistral-small-24b-w8a8",
   "inferenceBaseUrl": "https://mistral-small.com:443/v1",
   "inferenceApiKey": "abc123",
   "inferenceTemperature": "0.7",
   "inferenceMaxTokens": "2048",
-  "summaryPrompt": "You are a helpful assistant."
+  "systemPrompt": "You are a helpful assistant."
 }

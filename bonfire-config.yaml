@@ -1,0 +1,7 @@
+apps:
+- name: "{{ cookiecutter.projectName }}"
+  components:
+    - name: "{{ cookiecutter.projectName }}"
+      host: github
+      repo: "JuanmaBM/{{ cookiecutter.projectName }}"
+      path: templates/service-template.yaml
