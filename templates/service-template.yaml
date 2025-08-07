@@ -8,7 +8,7 @@ metadata:
     description: AI sample application
     tags: ai,service-delivery,{{cookiecutter.projectName}}
 labels:
-  template: "{{cookiecutter.projectName}}""
+  template: "{{cookiecutter.projectName}}"
 parameters:
   # Resource Configuration
   - name: MEMORY_REQUEST
@@ -85,7 +85,7 @@ objects:
                 - name: INFERENCE_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: ${parameter.projectName}-secret
+                      name: "{{parameter.projectName}}-secret"
                       key: INFERENCE_API_KEY
                 - name: INFERENCE_MODEL_NAME
                   value: ${INFERENCE_MODEL_NAME}
@@ -157,4 +157,4 @@ objects:
       name: "{{cookiecutter.projectName}}-secret"
     type: Opaque
     data:
-      INFERENCE_API_KEY:  "{{cookiecutter.inferenceApiKey}} | base64"
+      INFERENCE_API_KEY:  "{{cookiecutter.inferenceApiKey}}"
