@@ -2,68 +2,69 @@
 kind: Template
 apiVersion: template.openshift.io/v1
 metadata:
-  name: ${parameter.projectName}-service
+  name: "{{cookiecutter.projectName}}-service"
   annotations:
     openshift.io/display-name: AI sample application
     description: AI sample application
-    tags: ai,service-delivery,${parameter.projectName}
+    tags: ai,service-delivery,{{cookiecutter.projectName}}
 labels:
-  template: ${parameter.projectName}
+  template: "{{cookiecutter.projectName}}"
 parameters:
   # Resource Configuration
   - name: MEMORY_REQUEST
     description: Memory request for the API pods.
-    value: ${parameters.memoryRequest}
+    value: "{{cookiecutter.memoryRequest}}"
   - name: MEMORY_LIMIT
     description: Memory limit for the API pods.
-    value: ${parameters.memoryLimit}
+    value: "{{cookiecutter.memoryLimit}}"
   - name: CPU_REQUEST
     description: CPU request for the API pods.
-    value: ${parameters.cpuRequest}
+    value: "{{cookiecutter.cpuRequest}}"
   - name: CPU_LIMIT
     description: CPU limit for the API pods.
-    value: ${parameters.cpuLimit}
+    value: "{{cookiecutter.cpuLimit}}"
   # LLM Client Configuration
   - name: LLM_CLIENT_TYPE
     description: Type of LLM client to use (openai, langchain, llama_stack).
-    value: ${parameters.llmClientType}
+    value: "{{cookiecutter.llmClientType}}"
   - name: LANGCHAIN_PROVIDER
     description: LangChain provider to use (openai, ollama).
-    value: ${parameters.langchainProvider}
+    value: "{{cookiecutter.langchainProvider}}"
   # Inference Configuration
   - name: INFERENCE_MODEL_NAME
     description: Model name to use for inference.
-    value: ${parameters.inferenceModelName}
+    value: "{{cookiecutter.inferenceModelName}}"
   - name: INFERENCE_BASE_URL
     description: Base URL for the inference API endpoint.
-    value: ${parameters.inferenceBaseUrl}
+    value: "{{cookiecutter.inferenceBaseUrl}}"
   - name: INFERENCE_TEMPERATURE
     description: Temperature for response randomness (0.0-1.0).
-    value: ${parameters.inferenceTemperature}
+    value: "{{cookiecutter.inferenceTemperature}}"
   - name: INFERENCE_MAX_TOKENS
     description: Maximum number of tokens to generate in response.
-    value: ${parameters.inferenceMaxTokens}
+    value: "{{cookiecutter.inferenceMaxTokens}}"
   - name: SUMMARY_PROMPT
     description: System prompt for the AI assistant.
-    value: ${parameters.summaryPrompt}
+    value: "{{cookiecutter.systemPrompt}}"
 
 objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      name: ${parameter.projectName}
+      name: "{{cookiecutter.projectName}}"
     spec:
-      replicas: 3
+      replicas: 1
       selector:
         matchLabels:
-          app: ${parameter.projectName}
+          app: "{{cookiecutter.projectName}}"
       template:
         metadata:
           labels:
-            app: ${parameter.projectName}
+            app: "{{cookiecutter.projectName}}"
         spec:
           containers:
-            - name: ${parameter.projectName}
+            - name: "{{cookiecutter.projectName}}"
+              # TODO: Change this image for the app created image
               image: quay.io/jbarea/hcm-ai-sample-app:1.0
               ports:
                 - containerPort: 8000
@@ -85,8 +86,13 @@ objects:
                 - name: INFERENCE_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      name: ${parameter.projectName}-secret
                       key: INFERENCE_API_KEY
+                      {% if cookiecutter.inferenceServiceMode == 'Custom' %}
+                      name: "{{cookiecutter.projectName}}-secret"
+                      {% endif %}
+                      {% if cookiecutter.inferenceServiceMode == 'HCMAI' %}
+                      name: "hcmai-secret"
+                      {% endif %}
                 - name: INFERENCE_MODEL_NAME
                   value: ${INFERENCE_MODEL_NAME}
                 - name: INFERENCE_BASE_URL
@@ -125,10 +131,10 @@ objects:
   - apiVersion: v1
     kind: Service
     metadata:
-      name: ${parameter.projectName}
+      name: "{{cookiecutter.projectName}}"
     spec:
       selector:
-        app: ${parameter.projectName}
+        app: "{{cookiecutter.projectName}}"
       ports:
         - protocol: TCP
           port: 443
@@ -137,7 +143,7 @@ objects:
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
-      name: ${parameter.projectName}
+      name: "{{cookiecutter.projectName}}"
       annotations:
         haproxy.router.openshift.io/timeout: "1200s"
     spec:
@@ -145,16 +151,18 @@ objects:
         targetPort: 8000
       to:
         kind: Service
-        name: ${parameter.projectName}
+        name: "{{cookiecutter.projectName}}"
         weight: 100
       tls:
         termination: edge
       wildcardPolicy: None
 
+{% if cookiecutter.inferenceServiceMode == 'Custom' %}
   - apiVersion: v1
     kind: Secret
     metadata:
-      name: ${parameter.projectName}-secret
+      name: "{{cookiecutter.projectName}}-secret"
     type: Opaque
     data:
-      INFERENCE_API_KEY:  "{{ parameters.inferenceApiKey | b64enc }}"
+      INFERENCE_API_KEY:  "{{cookiecutter.inferenceApiKey}}"
+{% endif %}

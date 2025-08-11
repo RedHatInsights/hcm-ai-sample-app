@@ -26,14 +26,14 @@ def create_app():
                - REST API endpoints for health check and chat
                - Logging configured for application monitoring
     """
-    app = Flask("${parameters.projectName}")
+    app = Flask("{{cookiecutter.projectName}}")
     app.config["CORS_HEADER"] = "Content-Type"
     CORS(app)
 
     api = Api(app)
     _initialize_routes(api)
 
-    logger = logging.getLogger("${parameters.projectName}")
+    logger = logging.getLogger("{{cookiecutter.projectName}}")
     logger.info("HCM AI Sample App running!")
 
     return app
