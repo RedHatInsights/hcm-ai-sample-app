@@ -135,6 +135,16 @@ This includes support for:
 - OpenAI through LangChain (`langchain-openai`)
 - Ollama through LangChain (`langchain-ollama`)
 
+## Bonfire Deployment
+
+The application is prepared to deploy on ephemeral cluster through bonfire
+
+```
+bonfire deploy {{cookiecutter.projectName}} --local-config-path {application_path}/bonfire-config.yaml
+```
+
+Also you can copy the content of `bonfire-config.yaml` into your local bonfire configuration to avoid use `--local-config-path`
+
 ## 🚢 OpenShift Deployment
 
 The application includes an OpenShift template for easy deployment with configurable parameters.
