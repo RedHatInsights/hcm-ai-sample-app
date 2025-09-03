@@ -2,6 +2,6 @@ apps:
 - name: "{{ cookiecutter.projectName }}"
   components:
     - name: "{{ cookiecutter.projectName }}"
-      host: github
-      repo: "JuanmaBM/{{ cookiecutter.projectName }}"
+      host: "{{ cookiecutter.repositoryProvider }}"
+      repo: "{{ cookiecutter.repositoryOwner }}/{{ cookiecutter.repositoryName }}"
       path: templates/service-template.yaml
