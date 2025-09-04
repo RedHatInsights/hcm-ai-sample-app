@@ -196,7 +196,7 @@ objects:
                   cpu: 200m
               env:
                 - name: INFERENCE_BACKEND_HOST
-                  value: "{{cookiecutter.projectName}}"
+                  value: "http://{{cookiecutter.projectName}}:443"
                 - name: APP_NAME
                   value: "{{cookiecutter.projectName}}"
   - apiVersion: v1
