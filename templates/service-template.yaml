@@ -184,16 +184,9 @@ objects:
         spec:
           containers:
             - name: "chatbot-ui"
-              image: quay.io/jbarea/gradio-chat:1.0.2
+              image: quay.io/jbarea/gradio-chat:1.0.3
               ports:
                 - containerPort: 7860
-              resources:
-                requests:
-                  memory: 100Mi
-                  cpu: 100m
-                limits:
-                  memory: 250Mi
-                  cpu: 200m
               env:
                 - name: INFERENCE_BACKEND_HOST
                   value: "http://{{cookiecutter.projectName}}:443"
