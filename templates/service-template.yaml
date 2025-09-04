@@ -184,7 +184,7 @@ objects:
         spec:
           containers:
             - name: "chatbot-ui"
-              image: quay.io/jbarea/gradio-chat:1.0
+              image: quay.io/jbarea/gradio-chat:1.0.2
               ports:
                 - containerPort: 7860
               resources:
