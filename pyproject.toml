@@ -29,7 +29,8 @@ dev = [
   "ruff",
   "pre-commit",
   "python-dotenv",
-  "flake8"
+  "flake8",
+  "gradio"
 ]
 
 [tool.setuptools]

@@ -1,0 +1,443 @@
+/* HCM AI Assistant - Red Hat Corporate Theme */
+
+/* Global body and html styles */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #FFFFFF !important;
+    color: #151515 !important;
+}
+
+p {
+    color: #151515 !important;
+}
+
+/* Main app container */
+#root, .gradio-app {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Force full width for all main containers */
+.contain, .wrap {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+/* Specific Gradio containers */
+.gr-box, .gr-form, .gr-panel {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+/* Red Hat Color Palette:
+   - Red Hat Red: #EE0000
+   - Dark Red: #CC0000
+   - Black: #151515
+   - White: #FFFFFF
+   - Gray 100: #F5F5F5
+   - Gray 200: #EEEEEE
+   - Gray 300: #D2D2D2
+   - Gray 400: #BBBBBB
+   - Gray 500: #8A8D90
+   - Gray 600: #6A6E73
+   - Gray 700: #4F5255
+   - Blue: #0066CC
+   - Light Blue: #73BCF7
+*/
+
+/* Primary buttons (Send, Submit, etc.) */
+.primary {
+    background: linear-gradient(135deg, #EE0000 0%, #CC0000 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.primary:hover {
+    background: linear-gradient(135deg, #CC0000 0%, #AA0000 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(238, 0, 0, 0.3) !important;
+}
+
+/* Secondary buttons (Flag options, etc.) */
+.secondary {
+    background: linear-gradient(135deg, #0066CC 0%, #004499 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 500 !important;
+    border-radius: 4px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.secondary:hover {
+    background: linear-gradient(135deg, #004499 0%, #003366 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3) !important;
+}
+
+/* Flagging buttons */
+button[data-testid*="flag"] {
+    background: linear-gradient(135deg, #6A6E73 0%, #4F5255 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 500 !important;
+    border-radius: 4px !important;
+    padding: 8px 16px !important;
+    margin: 4px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+    letter-spacing: 0.5px !important;
+}
+
+button[data-testid*="flag"]:hover {
+    background: linear-gradient(135deg, #4F5255 0%, #151515 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 3px 8px rgba(106, 110, 115, 0.4) !important;
+}
+
+/* Submit/Send button specific styling */
+button[data-testid="chatbot-submit"] {
+    background: linear-gradient(135deg, #EE0000 0%, #CC0000 100%) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 700 !important;
+    border-radius: 4px !important;
+    padding: 12px 24px !important;
+    transition: all 0.3s ease !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    font-size: 14px !important;
+}
+
+button[data-testid="chatbot-submit"]:hover {
+    background: linear-gradient(135deg, #CC0000 0%, #AA0000 100%) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 16px rgba(238, 0, 0, 0.4) !important;
+}
+
+/* Chat input area */
+.chatbot {
+    border-radius: 4px !important;
+    border: 2px solid #D2D2D2 !important;
+    box-shadow: 0 2px 4px rgba(21, 21, 21, 0.1) !important;
+    background: #FFFFFF !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 60vh !important;
+}
+
+
+
+/* Remove vertical lines and borders that might appear */
+.chatbot .message-row, .chatbot .message-wrap {
+    border: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* Ensure proper contrast for all text */
+.chatbot .markdown, .chatbot .prose {
+    color: #151515 !important;
+}
+
+/* Text input field */
+textarea, input[type="text"] {
+    border-radius: 4px !important;
+    border: 1px solid #D2D2D2 !important;
+    transition: all 0.3s ease !important;
+    font-family: 'Red Hat Text', 'Red Hat Display', sans-serif !important;
+    background: #FFFFFF !important;
+    color: #151515 !important;
+}
+
+/* Force text color for all input elements */
+.gr-textbox, .gr-textbox textarea, .gr-textbox input {
+    color: #151515 !important;
+    background: #FFFFFF !important;
+}
+
+textarea:focus {
+    border-color: #EE0000 !important;
+    box-shadow: 0 0 0 3px rgba(238, 0, 0, 0.1) !important;
+    outline: none !important;
+}
+
+/* Message bubbles */
+.message.user, .user {
+    background: linear-gradient(135deg, #EE0000 0%, #CC0000 100%) !important;
+    color: white !important;
+    border-radius: 16px 16px 4px 16px !important;
+    box-shadow: 0 2px 8px rgba(238, 0, 0, 0.2) !important;
+    border: none !important;
+}
+
+.message.bot, .bot {
+    background: linear-gradient(135deg, #F5F5F5 0%, #EEEEEE 100%) !important;
+    color: #151515 !important;
+    border-radius: 16px 16px 16px 4px !important;
+    border: 1px solid #D2D2D2 !important;
+    box-shadow: 0 2px 4px rgba(21, 21, 21, 0.05) !important;
+}
+
+/* Fix for chat messages visibility */
+.chatbot .message, .chatbot .user, .chatbot .bot {
+    color: inherit !important;
+}
+
+.chatbot .user {
+    color: white !important;
+}
+
+.chatbot .bot {
+    color: #151515 !important;
+}
+
+/* Remove any weird vertical lines */
+.chatbot .message::before, .chatbot .message::after,
+.chatbot .user::before, .chatbot .user::after,
+.chatbot .bot::before, .chatbot .bot::after {
+    display: none !important;
+}
+
+/* Additional fixes for vertical lines and borders */
+.chatbot [class*="border"], .chatbot [class*="divide"] {
+    border: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+/* Ensure message text is always visible */
+.chatbot .user *, .chatbot .user {
+    color: white !important;
+    background: transparent !important;
+}
+
+.chatbot .bot *, .chatbot .bot {
+    color: #151515 !important;
+    background: transparent !important;
+}
+
+/* Custom styling for the overall interface */
+.gradio-container {
+    font-family: 'Red Hat Text', 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    max-width: 100% !important;
+    width: 100vw !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 2rem !important;
+    background: #FFFFFF !important;
+    box-sizing: border-box !important;
+}
+
+/* Title and headers */
+h1, h2, h3 {
+    color: #151515 !important;
+    font-family: 'Red Hat Display', sans-serif !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+}
+
+h1 {
+    color: #EE0000 !important;
+    font-size: 2.5rem !important;
+}
+
+h2 {
+    color: #151515 !important;
+    font-size: 2rem !important;
+}
+
+h3 {
+    color: #6A6E73 !important;
+    font-size: 1.5rem !important;
+}
+
+/* Description text */
+.description, .gr-markdown, .gr-markdown p, .gr-markdown * {
+    color: #151515 !important;
+    font-size: 1.1rem !important;
+    margin-bottom: 2rem !important;
+    font-family: 'Red Hat Text', sans-serif !important;
+    font-weight: 500 !important;
+    background: rgba(245, 245, 245, 0.9) !important;
+    padding: 1rem !important;
+    border-radius: 4px !important;
+    border-left: 4px solid #EE0000 !important;
+    text-shadow: none !important;
+    line-height: 1.5 !important;
+}
+
+/* Specific targeting for Gradio description */
+.gradio-container .gr-markdown {
+    background: rgba(245, 245, 245, 0.9) !important;
+    padding: 1rem !important;
+    border-radius: 4px !important;
+    border-left: 4px solid #EE0000 !important;
+    margin-bottom: 2rem !important;
+    color: #151515 !important;
+}
+
+
+
+/* Loading spinner */
+.loading {
+    color: #EE0000 !important;
+}
+
+/* Error messages */
+.error {
+    background: linear-gradient(135deg, #FFF5F5 0%, #FFEBEE 100%) !important;
+    border: 1px solid #EE0000 !important;
+    color: #CC0000 !important;
+    border-radius: 4px !important;
+    padding: 16px !important;
+    margin: 8px 0 !important;
+    font-weight: 500 !important;
+}
+
+/* Success messages */
+.success {
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%) !important;
+    border: 1px solid #0066CC !important;
+    color: #004499 !important;
+    border-radius: 4px !important;
+    padding: 16px !important;
+    margin: 8px 0 !important;
+    font-weight: 500 !important;
+}
+
+/* Custom scrollbar */
+.chatbot .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chatbot .overflow-y-auto::-webkit-scrollbar-track {
+    background: #F5F5F5;
+    border-radius: 4px;
+}
+
+.chatbot .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #EE0000 0%, #CC0000 100%);
+    border-radius: 4px;
+}
+
+.chatbot .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #CC0000 0%, #AA0000 100%);
+}
+
+/* Red Hat corporate header styling */
+.gradio-container::before {
+    content: "";
+    display: block;
+    height: 4px;
+    background: #EE0000;
+    margin-bottom: 2rem;
+}
+
+/* Corporate footer */
+.gradio-container::after {
+    content: "Powered by Red Hat Technology";
+    display: block;
+    text-align: center;
+    color: #6A6E73;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    border-top: 1px solid #D2D2D2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Input field placeholder styling */
+textarea::placeholder, input::placeholder {
+    color: #8A8D90 !important;
+    font-style: italic;
+}
+
+
+
+/* Remove any text shadows that might hide text */
+* {
+    text-shadow: none !important;
+}
+
+
+
+/* Focus states for accessibility */
+button:focus,
+textarea:focus {
+    outline: 2px solid #EE0000 !important;
+    outline-offset: 2px !important;
+}
+
+/* Disabled state */
+button:disabled {
+    background: #D2D2D2 !important;
+    color: #8A8D90 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .gradio-container {
+        padding: 1rem !important;
+        width: 100vw !important;
+    }
+    
+    .chatbot {
+        margin: 0 !important;
+        width: 100% !important;
+        min-height: 50vh !important;
+    }
+    
+    button {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+    }
+    
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    .description {
+        font-size: 1rem !important;
+        padding: 0.8rem !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .message.user {
+        background: #151515 !important;
+        border: 2px solid #FFFFFF !important;
+    }
+    
+    .message.bot {
+        background: #FFFFFF !important;
+        border: 2px solid #151515 !important;
+    }
+    
+    button {
+        border: 2px solid #151515 !important;
+    }
+} 

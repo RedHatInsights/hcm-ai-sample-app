@@ -166,3 +166,63 @@ objects:
     data:
       INFERENCE_API_KEY:  "{{cookiecutter.inferenceApiKey}}"
 {% endif %}
+
+{% if cookiecutter.chatEnabled %}
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: "chatbot-ui"
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: "chatbot-ui"
+      template:
+        metadata:
+          labels:
+            app: "chatbot-ui"
+        spec:
+          containers:
+            - name: "chatbot-ui"
+              image: quay.io/jbarea/gradio-chat:1.0
+              ports:
+                - containerPort: 7860
+              resources:
+                requests:
+                  memory: 100Mi
+                  cpu: 100m
+                limits:
+                  memory: 250Mi
+                  cpu: 200m
+              env:
+                - name: INFERENCE_BACKEND_HOST
+                  value: "{{cookiecutter.projectName}}"
+                - name: APP_NAME
+                  value: "{{cookiecutter.projectName}}"
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: "chatbot-ui"
+    spec:
+      selector:
+        app: "chatbot-ui"
+      ports:
+        - protocol: TCP
+          port: 443
+          targetPort: 7860
+
+  - apiVersion: route.openshift.io/v1
+    kind: Route
+    metadata:
+      name: "chatbot-ui"
+    spec:
+      port:
+        targetPort: 7860
+      to:
+        kind: Service
+        name: "chatbot-ui"
+        weight: 100
+      tls:
+        termination: edge
+      wildcardPolicy: None
+{% endif %}
