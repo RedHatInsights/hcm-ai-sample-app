@@ -1,6 +1,6 @@
 # HCM AI Sample App
 
-A Flask application that provides a unified API interface for different LLM providers through a simplified client architecture.
+A Flask application that provides a unified API interface for different LLM providers through a simplified client architecture, with an integrated Gradio chatbot interface for easy interaction.
 
 ## ✨ Features
 
@@ -8,6 +8,7 @@ A Flask application that provides a unified API interface for different LLM prov
 - **Unified Configuration**: Single set of environment variables for all providers
 - **LangChain Integration**: Access to multiple providers through LangChain unified interface  
 - **Streaming Support**: Real-time response streaming for all providers
+- **Gradio Chatbot Interface**: User-friendly web interface for chatting with LLM models
 
 ## 🚀 Quick Start
 
@@ -35,7 +36,7 @@ uv pip install -e .
 flask run
 ```
 
-The application will be available at `http://localhost:5000`
+The application will be available at `http://localhost:8000` (as configured in `.flaskenv`)
 
 ## ⚙️ Configuration
 
@@ -134,6 +135,67 @@ pip install -e .
 This includes support for:
 - OpenAI through LangChain (`langchain-openai`)
 - Ollama through LangChain (`langchain-ollama`)
+
+## 💬 Chatbot Interface
+
+The application includes a Gradio-based chatbot interface that provides a user-friendly way to interact with the LLM API.
+
+### Running the Chatbot
+
+1. **Start the Flask API first**:
+   ```bash
+   # Set required environment variables
+   export LLM_CLIENT_TYPE="openai"
+   export INFERENCE_API_KEY="your-api-key"
+   
+   # Start the API server
+   flask run
+   ```
+
+2. **Run the chatbot in a separate terminal**:
+   ```bash
+   python chatbot.py
+   ```
+
+3. **Access the chatbot**:
+   - Open your browser and go to `http://localhost:7860`
+   - Start chatting with your LLM!
+
+### Chatbot Features
+
+- **Streaming Responses**: Real-time response display as the LLM generates text
+- **Chat History**: Conversation history is maintained during the session
+- **Error Handling**: User-friendly error messages when the API is unavailable
+- **Responsive UI**: Modern Gradio interface with chat bubbles and formatting
+- **Flagging Options**: Ability to flag responses (Like, Spam, Inappropriate, Other)
+
+### Docker Deployment
+
+You can also run the chatbot using Docker:
+
+```bash
+# Build the chatbot image
+docker build -f Dockerfile.chatbot -t chatbot .
+
+# Run the chatbot (make sure API is running on port 8000)
+docker run -p 7860:7860 \
+  -e INFERENCE_BACKEND_HOST="http://host.docker.internal:8000" \
+  chatbot
+```
+
+**Access points**:
+- **Chatbot Interface**: http://localhost:7860
+- **Flask API**: http://localhost:8000
+
+### Configuration
+
+The chatbot can be configured using environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `INFERENCE_BACKEND_HOST` | URL of the Flask API | `http://localhost:8000` |
+| `GRADIO_SERVER_NAME` | Gradio server bind address | `127.0.0.1` |
+| `GRADIO_SERVER_PORT` | Gradio server port | `7860` |
 
 ## Bonfire Deployment
 
@@ -356,6 +418,7 @@ The application uses a unified client architecture that abstracts different LLM 
 - **Flask API**: Handles HTTP requests and responses via ChatApi
 - **LLM Client**: Unified interface (`llm.client`) for different LLM providers
 - **LLM Providers**: Support for OpenAI and LangChain (OpenAI/Ollama)
+- **Gradio Chatbot**: Web-based chat interface that connects to the Flask API
 
 ### Features
 
@@ -366,20 +429,47 @@ The application uses a unified client architecture that abstracts different LLM 
 - ✅ **LangChain Integration**: Access to OpenAI, Ollama through LangChain
 - ✅ **Flexible Model Support**: Local models via Ollama, cloud models via APIs
 - ✅ **Error Handling**: Comprehensive error handling and validation
+- ✅ **User-Friendly Interface**: Gradio chatbot for easy interaction
 
 ## 🧪 Testing
 
-### Test with curl
+### Test the Flask API with curl
 
 ```bash
 # Test health endpoint
-curl http://localhost:5000/health
+curl http://localhost:8000/health
 
-# Test chat endpoint
-curl -X POST http://localhost:5000/chat \
+# Test chat endpoint (non-streaming)
+curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"prompt": "Hello, how are you?", "enable_stream": "False"}'
+
+# Test chat endpoint (streaming)
+curl -X POST http://localhost:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Write a short story", "enable_stream": "True"}'
 ```
+
+### Test the Chatbot Interface
+
+1. **Start both services**:
+   ```bash
+   # Terminal 1: Start Flask API
+   export LLM_CLIENT_TYPE="openai"
+   export INFERENCE_API_KEY="your-api-key"
+   flask run
+   
+   # Terminal 2: Start Chatbot
+   python chatbot.py
+   ```
+
+2. **Access the chatbot**: Open `http://localhost:7860` in your browser
+
+3. **Test features**:
+   - Send a message and verify streaming response
+   - Check error handling by stopping the Flask API
+   - Test conversation history
+   - Try the flagging options
 
 ## 🚨 Error Handling
 

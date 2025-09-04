@@ -15,5 +15,6 @@
   "systemPrompt": "You are a helpful assistant.",
   "repositoryOwner": "user",
   "repositoryProvider": "github",
-  "repositoryName": "repoName"
+  "repositoryName": "repoName",
+  "chatEnabled": "False"
 }
