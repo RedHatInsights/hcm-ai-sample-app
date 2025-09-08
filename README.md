@@ -199,13 +199,46 @@ The chatbot can be configured using environment variables:
 
 ## Bonfire Deployment
 
-The application is prepared to deploy on ephemeral cluster through bonfire
+The application is prepared to deploy on ephemeral cluster through bonfire.
 
-```
-bonfire deploy {{cookiecutter.projectName}} --local-config-path {application_path}/bonfire-config.yaml
+### Deployment on Ephemeral Environment
+
+For deploying on ephemeral environments, use the provided `deploy_on_ephemeral.sh` script:
+
+```bash
+./deploy_on_ephemeral.sh <API_KEY> <NAMESPACE>
 ```
 
-Also you can copy the content of `bonfire-config.yaml` into your local bonfire configuration to avoid use `--local-config-path`
+**Example:**
+```bash
+./deploy_on_ephemeral.sh "your-api-key-here" "my-ephemeral-namespace"
+```
+
+#### Namespace Management
+
+Before deploying, you need to obtain a namespace. You have two options:
+
+1. **Reserve a new namespace:**
+   ```bash
+   bonfire namespace reserve
+   ```
+
+2. **Use an existing reserved namespace:**
+   ```bash
+   # List your available namespaces
+   bonfire namespace list
+   
+   # Use one of the listed namespaces in the deployment command
+   ./deploy_on_ephemeral.sh "your-api-key" "existing-namespace-name"
+   ```
+
+#### Security Features
+
+The `deploy_on_ephemeral.sh` script includes important security measures:
+
+- **🔒 Secure Secret Management**: The script automatically creates the necessary secrets in the Kubernetes cluster
+- **🛡️ No Credentials in Repository**: Prevents potential security vulnerabilities by keeping API keys and sensitive credentials out of the repository
+- **✅ Safe Deployment**: Ensures credentials are handled securely during the deployment process
 
 ## 🚢 OpenShift Deployment
 
@@ -226,83 +259,6 @@ The application includes an OpenShift template for easy deployment with configur
 | `INFERENCE_TEMPERATURE` | Response randomness (0.0-1.0) | `"0.7"` |
 | `INFERENCE_MAX_TOKENS` | Maximum tokens to generate | `"2048"` |
 | `SUMMARY_PROMPT` | System prompt for the AI assistant | `"You are a helpful assistant."` |
-
-### Deployment Examples
-
-#### Deploy with Default Values
-```bash
-oc process -f templates/service-template.yaml | oc apply -f -
-```
-
-#### Deploy with Custom Configuration
-```bash
-oc process -f templates/service-template.yaml \
-  -p LLM_CLIENT_TYPE="openai" \
-  -p INFERENCE_MODEL_NAME="gpt-4" \
-  -p INFERENCE_TEMPERATURE="0.8" \
-  -p INFERENCE_MAX_TOKENS="1024" \
-  -p SUMMARY_PROMPT="You are an expert assistant." \
-  | oc apply -f -
-```
-
-#### Deploy for Ollama Usage
-```bash
-oc process -f templates/service-template.yaml \
-  -p LLM_CLIENT_TYPE="langchain" \
-  -p LANGCHAIN_PROVIDER="ollama" \
-  -p INFERENCE_MODEL_NAME="llama3.2" \
-  -p INFERENCE_BASE_URL="http://ollama-service:11434" \
-  -p MEMORY_LIMIT="2Gi" \
-  | oc apply -f -
-```
-
-#### Deploy for Production Workload
-```bash
-oc process -f templates/service-template.yaml \
-  -p MEMORY_REQUEST="1Gi" \
-  -p MEMORY_LIMIT="2Gi" \
-  -p CPU_REQUEST="500m" \
-  -p CPU_LIMIT="1000m" \
-  -p INFERENCE_MODEL_NAME="gpt-4" \
-  -p INFERENCE_TEMPERATURE="0.5" \
-  | oc apply -f -
-```
-
-### Template Management
-
-#### View Available Parameters
-```bash
-oc process --parameters -f templates/service-template.yaml
-```
-
-#### Process Template without Applying
-```bash
-oc process -f templates/service-template.yaml \
-  -p LLM_CLIENT_TYPE="openai" \
-  -p INFERENCE_MODEL_NAME="gpt-4"
-```
-
-#### Update Existing Deployment
-```bash
-oc process -f templates/service-template.yaml \
-  -p INFERENCE_TEMPERATURE="0.9" \
-  | oc apply -f -
-```
-
-### Secret Configuration
-
-The template creates a secret with the API key. Update the secret with your actual API key:
-
-```bash
-# Create or update the secret
-oc create secret generic {{cookiecutter.projectName}}-secret \
-  --from-literal=INFERENCE_API_KEY="your-actual-api-key" \
-  --dry-run=client -o yaml | oc apply -f -
-
-# Or patch existing secret
-oc patch secret {{cookiecutter.projectName}}-secret \
-  -p '{"data":{"INFERENCE_API_KEY":"'$(echo -n "your-actual-api-key" | base64)'"}}'
-```
 
 ### Monitoring and Health Checks
 
