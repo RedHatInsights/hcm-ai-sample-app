@@ -88,10 +88,10 @@ objects:
                     secretKeyRef:
                       key: INFERENCE_API_KEY
                       {% if cookiecutter.inferenceServiceMode == 'Custom' %}
-                      name: "{{cookiecutter.projectName}}-secret"
+                      name: "custom-inference-api-key"
                       {% endif %}
                       {% if cookiecutter.inferenceServiceMode == 'HCMAI' %}
-                      name: "hcmai-secret"
+                      name: "hcmai-api-key"
                       {% endif %}
                 - name: INFERENCE_MODEL_NAME
                   value: ${INFERENCE_MODEL_NAME}
@@ -156,16 +156,6 @@ objects:
       tls:
         termination: edge
       wildcardPolicy: None
-
-{% if cookiecutter.inferenceServiceMode == 'Custom' %}
-  - apiVersion: v1
-    kind: Secret
-    metadata:
-      name: "{{cookiecutter.projectName}}-secret"
-    type: Opaque
-    data:
-      INFERENCE_API_KEY:  "{{cookiecutter.inferenceApiKey}}"
-{% endif %}
 
 {% if cookiecutter.chatEnabled %}
   - apiVersion: apps/v1
