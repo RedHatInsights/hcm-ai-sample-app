@@ -88,7 +88,7 @@ objects:
                     secretKeyRef:
                       key: INFERENCE_API_KEY
                       {% if cookiecutter.inferenceServiceMode == 'Custom' %}
-                      name: "custom-inference-api-key"
+                      name: "custom-api-key"
                       {% endif %}
                       {% if cookiecutter.inferenceServiceMode == 'HCMAI' %}
                       name: "hcmai-api-key"

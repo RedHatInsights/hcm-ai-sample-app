@@ -18,7 +18,7 @@ kubectl create secret generic custom-api-key \
   -n "$NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-echo "✅ Secret 'custom-inference-api-key' created or updated in namespace $NAMESPACE"
+echo "✅ Secret 'custom-api-key' created or updated in namespace $NAMESPACE"
 
 # 3) Deploy with bonfire
 bonfire deploy {{cookiecutter.projectName}} --namespace="$NAMESPACE" --local-config-path bonfire-config.yaml
