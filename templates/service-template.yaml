@@ -86,7 +86,7 @@ objects:
                 - name: INFERENCE_API_KEY
                   valueFrom:
                     secretKeyRef:
-                      key: INFERENCE_API_KEY
+                      key: token
                       {% if cookiecutter.inferenceServiceMode == 'Custom' %}
                       name: "custom-api-key"
                       {% endif %}
