@@ -14,7 +14,7 @@ echo "Using namespace: $NAMESPACE"
 
 # 2) Create or update the secret
 kubectl create secret generic custom-api-key \
-  --from-literal=INFERENCE_API_KEY="$API_KEY" \
+  --from-literal=token="$API_KEY" \
   -n "$NAMESPACE" \
   --dry-run=client -o yaml | kubectl apply -f -
 
