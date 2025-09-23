@@ -199,11 +199,11 @@ The chatbot can be configured using environment variables:
 
 ## Bonfire Deployment
 
-The application is prepared to deploy on ephemeral cluster through bonfire.
+The application is prepared to deploy on ephemeral cluster through bonfire. There are two deployment approaches depending on your use case:
 
-### Deployment on Ephemeral Environment
+### Option 1: Custom Configuration Deployment
 
-For deploying on ephemeral environments, use the provided `deploy_on_ephemeral.sh` script:
+For deploying on ephemeral environments with custom configuration, use the provided `deploy_on_ephemeral.sh` script:
 
 ```bash
 ./deploy_on_ephemeral.sh <API_KEY> <NAMESPACE>
@@ -214,9 +214,9 @@ For deploying on ephemeral environments, use the provided `deploy_on_ephemeral.s
 ./deploy_on_ephemeral.sh "your-api-key-here" "my-ephemeral-namespace"
 ```
 
-#### Namespace Management
+#### Prerequisites for Custom Deployment
 
-Before deploying, you need to obtain a namespace. You have two options:
+Before deploying with custom configuration, you must reserve a namespace. You have two options:
 
 1. **Reserve a new namespace:**
    ```bash
@@ -239,6 +239,26 @@ The `deploy_on_ephemeral.sh` script includes important security measures:
 - **🔒 Secure Secret Management**: The script automatically creates the necessary secrets in the Kubernetes cluster
 - **🛡️ No Credentials in Repository**: Prevents potential security vulnerabilities by keeping API keys and sensitive credentials out of the repository
 - **✅ Safe Deployment**: Ensures credentials are handled securely during the deployment process
+
+### Option 2: HCMAI Deployment
+
+If you want to use HCMAI, deploy the resources using bonfire with the following command:
+
+```bash
+bonfire deploy {{cookiecutter.projectName}} --pool ai-development --team <your-team> --local-config-path bonfire-config.yaml
+```
+
+**Example:**
+```bash
+bonfire deploy {{cookiecutter.projectName}} --pool ai-development --team engineering-productivity --local-config-path bonfire-config.yaml
+```
+
+This approach uses the HCMAI infrastructure with:
+- **Pool**: `ai-development` (required for the credential copying process to the reserved namespace)
+- **Team**: Your team name (replace `<your-team>` with your actual team)
+- **Configuration**: Local bonfire configuration file
+
+**Important:** The `ai-development` pool must be used to ensure that credentials are automatically copied to the reserved namespace.
 
 ## 🚢 OpenShift Deployment
 

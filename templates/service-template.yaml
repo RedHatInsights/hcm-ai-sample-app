@@ -91,7 +91,7 @@ objects:
                       name: "custom-api-key"
                       {% endif %}
                       {% if cookiecutter.inferenceServiceMode == 'HCMAI' %}
-                      name: "hcmai-api-key"
+                      name: "convo-stage-sa-token"
                       {% endif %}
                 - name: INFERENCE_MODEL_NAME
                   value: ${INFERENCE_MODEL_NAME}
